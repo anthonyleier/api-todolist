@@ -23,7 +23,7 @@ disallow_untyped_calls = true
 check_untyped_defs = true
 
 [tool.ruff]
-line-length = 79
+line-length = 89
 extend-exclude = ['migrations']
 
 [tool.ruff.lint]
