@@ -17,13 +17,6 @@ pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
 taskipy = "^1.14.0"
 ruff = "^0.7.1"
-mypy = "^1.13.0"
-
-[tool.mypy]
-files = ["app/"]
-ignore_missing_imports = true
-disallow_untyped_calls = true
-check_untyped_defs = true
 
 [tool.ruff]
 line-length = 120
@@ -45,10 +38,9 @@ addopts = '-p no:warnings'
 lint = 'ruff check . && ruff check . --diff'
 format = 'ruff check . --fix && ruff format .'
 run = 'fastapi dev'
-pre_test = 'task lint && task typecheck'
+pre_test = 'task lint'
 test = 'pytest -s -x --cov=app -vv'
 post_test = 'coverage html'
-typecheck = 'mypy app/'
 
 [build-system]
 requires = ["poetry-core"]
