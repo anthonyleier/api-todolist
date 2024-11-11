@@ -69,6 +69,12 @@ def test_read_user(client, user):
     assert response.json() == user_schema
 
 
+def test_read_user_not_found(client):
+    response = client.get('/users/1024')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'User not found'}
+
+
 def test_update_user(client, user, token):
     response = client.put(
         f'/users/{user.id}',
