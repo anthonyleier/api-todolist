@@ -89,21 +89,12 @@ def test_update_user(client, user, token):
     assert response.json() == {'username': 'bob', 'email': 'bob@example.com', 'id': user.id}
 
 
-def test_update_user_integrity_error(client, user, token):
-    client.post(
-        '/users',
-        json={
-            'username': 'pedro',
-            'email': 'pedro@gmail.com',
-            'password': 'pedro123',
-        },
-    )
-
+def test_update_user_integrity_error(client, user, other_user, token):
     response_update = client.put(
         f'/users/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'username': 'pedro',
+            'username': other_user.username,
             'email': 'mateus@gmail.com',
             'password': 'mateus123',
         },
