@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 from datetime import datetime
 
+import factory
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import StaticPool, create_engine, event
@@ -36,19 +37,6 @@ def session():
 
 
 @pytest.fixture
-def user(session):
-    password = 'mateus123'
-    user = User(username='Mateus', email='mateus@gmail.com', password=get_password_hash(password))
-
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-
-    user.clean_password = password
-    return user
-
-
-@pytest.fixture
 def token(client, user):
     response = client.post('/auth/token', data={'username': user.username, 'password': user.clean_password})
     return response.json()['access_token']
@@ -72,3 +60,40 @@ def _mock_db_time(*, model, time=datetime(2024, 1, 1)):
     yield time
 
     event.remove(model, 'before_insert', fake_time_hook)
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: f'test{n}')
+    email = factory.LazyAttribute(lambda obj: f'{obj.username}@test.com')
+    password = factory.LazyAttribute(lambda obj: f'{obj.username}123')
+
+
+@pytest.fixture
+def user(session):
+    password = 'testtest'
+    user = UserFactory(password=get_password_hash(password))
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    user.clean_password = password
+
+    return user
+
+
+@pytest.fixture
+def other_user(session):
+    password = 'testtest'
+    user = UserFactory(password=get_password_hash(password))
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    user.clean_password = password
+
+    return user
