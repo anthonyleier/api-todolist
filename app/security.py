@@ -14,7 +14,7 @@ from app.models import User
 from app.schemas import TokenData
 from app.settings import Settings
 
-settings = Settings()
+settings = Settings()  # type: ignore
 pwd_context = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 

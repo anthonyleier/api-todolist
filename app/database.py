@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.settings import Settings
 
-settings = Settings()
+settings = Settings()  # type: ignore
 engine = create_engine(settings.DATABASE_URL)
 
 

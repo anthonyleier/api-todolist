@@ -63,7 +63,7 @@ def _mock_db_time(*, model, time=datetime(2024, 1, 1)):
 
 
 class UserFactory(factory.Factory):
-    class Meta:
+    class Meta:  # type: ignore
         model = User
 
     username = factory.Sequence(lambda n: f'test{n}')
