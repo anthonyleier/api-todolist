@@ -50,3 +50,9 @@ class TodoPublic(TodoSchema):
 
 class TodoList(BaseModel):
     todos: list[TodoPublic]
+
+
+class FilterTodo(FilterPage):
+    title: str | None = None
+    description: str | None = None
+    state: TodoState | None = None
