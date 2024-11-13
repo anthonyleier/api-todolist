@@ -16,17 +16,35 @@ class TodoFactory(factory.Factory):
     user_id = 1
 
 
-def test_create_todo(client, token):
-    response = client.post(
-        '/todos/',
-        headers={'Authorization': f'Bearer {token}'},
-        json={
-            'title': 'Test todo',
-            'description': 'Test todo description',
-            'state': 'draft',
-        },
-    )
-    assert response.json() == {'id': 1, 'title': 'Test todo', 'description': 'Test todo description', 'state': 'draft'}
+def test_create_todo(client, token, mock_db_time):
+    with mock_db_time(model=Todo) as time:
+        response = client.post(
+            '/todos/',
+            headers={'Authorization': f'Bearer {token}'},
+            json={
+                'title': 'Test todo',
+                'description': 'Test todo description',
+                'state': 'draft',
+            },
+        )
+        assert response.json() == {'id': 1, 'title': 'Test todo', 'description': 'Test todo description', 'state': 'draft', 'created_at': time.isoformat(), 'updated_at': time.isoformat()}
+
+
+def test_list_todo_with_fields(session, client, user, token, mock_db_time):
+    with mock_db_time(model=Todo) as time:
+        todo = TodoFactory(title='title', description='description', state=TodoState.done, user_id=user.id)
+        session.add(todo)
+        session.commit()
+
+        response = client.get('/todos', headers={'Authorization': f'Bearer {token}'})
+        assert response.json()['todos'][0] == {
+            'id': 1,
+            'title': 'title',
+            'description': 'description',
+            'state': 'done',
+            'created_at': time.isoformat(),
+            'updated_at': time.isoformat(),
+        }
 
 
 def test_list_todos_should_return_5_todos(session, client, user, token):
@@ -120,6 +138,6 @@ def test_delete_todo(session, client, user, token):
 
 
 def test_delete_todo_error(client, token):
-    response = client.delete('/todos/10', headers={'Authorization': f"Bearer {token}"})
+    response = client.delete('/todos/10', headers={'Authorization': f'Bearer {token}'})
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'Task not found'}
