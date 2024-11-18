@@ -4,8 +4,9 @@ from datetime import datetime
 import factory
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import StaticPool, create_engine, event
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
+from testcontainers.postgres import PostgresContainer
 
 from app.database import get_session
 from app.main import app
@@ -25,13 +26,22 @@ def client(session):
     app.dependency_overrides.clear()
 
 
+@pytest.fixture(scope='session')
+def engine():
+    with PostgresContainer('postgres:16', driver='psycopg2') as postgres:
+        _engine = create_engine(postgres.get_connection_url())
+
+        with _engine.begin():
+            yield _engine
+
+
 @pytest.fixture
-def session():
-    engine = create_engine('sqlite:///:memory:', connect_args={'check_same_thread': False}, poolclass=StaticPool)
+def session(engine):
     table_registry.metadata.create_all(engine)
 
     with Session(engine) as session:
         yield session
+        session.rollback()
 
     table_registry.metadata.drop_all(engine)
 

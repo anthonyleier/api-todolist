@@ -104,7 +104,7 @@ def test_list_todos_filter_combined_should_return_5_todos(session, client, user,
     session.bulk_save_objects(TodoFactory.create_batch(3, user_id=user.id, title='Other title', description='Other description', state=TodoState.todo))
     session.commit()
 
-    response = client.get('/todos/?title=Test todo combined&description=combined&state=done', headers={'Authorization': f'Bearer {token}'})
+    response = client.get('/todos/?title=Test todo combined&description=Combined&state=done', headers={'Authorization': f'Bearer {token}'})
     assert len(response.json()['todos']) == expected_todos
 
 
