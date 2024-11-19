@@ -6,6 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: default
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
